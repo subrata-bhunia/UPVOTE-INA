@@ -1,0 +1,63 @@
+{
+  "name": "Upvote",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "clean": "cd android && ./gradlew clean && cd ../",
+    "load": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/",
+    "clear": "cd android && ./gradlew cleanBuildCache && cd ../",
+    "reset": "react-native start --reset-cache",
+    "update:pods": "cd ios && pod install --repo-update && cd ..",
+    "apk": "cd android && ./gradlew assembleRelease && cd ../",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@react-navigation/drawer": "^6.1.4",
+    "@react-navigation/material-top-tabs": "^6.0.2",
+    "@react-navigation/native": "^6.0.2",
+    "@react-navigation/native-stack": "^6.1.0",
+    "axios": "^0.25.0",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
+    "pullstate": "^1.23.0",
+    "react": "17.0.2",
+    "react-moment": "^1.1.1",
+    "react-native": "0.65.1",
+    "react-native-contacts": "^7.0.2",
+    "react-native-document-picker": "^6.0.4",
+    "react-native-drop-shadow": "^0.0.2",
+    "react-native-elements": "^3.4.2",
+    "react-native-gesture-handler": "^1.10.3",
+    "react-native-image-crop-picker": "^0.36.2",
+    "react-native-otp-textinput": "^0.0.8",
+    "react-native-pager-view": "^5.4.4",
+    "react-native-reanimated": "^2.2.2",
+    "react-native-responsive-screen": "^1.4.2",
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-screens": "^3.7.0",
+    "react-native-select-dropdown": "^1.1.0",
+    "react-native-slide-modal": "^0.0.32",
+    "react-native-tab-view": "^3.1.1",
+    "react-native-twitter-textview": "^1.0.7",
+    "react-native-vector-icons": "^8.1.0",
+    "save": "^2.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/runtime": "^7.15.4",
+    "@react-native-community/eslint-config": "^3.0.1",
+    "babel-jest": "^27.1.1",
+    "eslint": "^7.32.0",
+    "jest": "^27.1.1",
+    "metro-react-native-babel-preset": "^0.66.2",
+    "react-native-codegen": "^0.0.7",
+    "react-test-renderer": "17.0.2"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}
