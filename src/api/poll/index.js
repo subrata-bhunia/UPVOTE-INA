@@ -1,5 +1,3 @@
-
-
 import {API_URL} from '../config';
 import axios from 'axios';
 
@@ -7,6 +5,7 @@ var pollUrl = `${API_URL}/poll`;
 var pollBlockUrl = `${API_URL}/pollBlock`;
 var pollShareUrl = `${API_URL}/pollShare`;
 var pollLikeUrl = `${API_URL}/pollLike`;
+var pollCommentUrl = `${API_URL}/pollComment`;
 // Post Poll
 export const PostPoll = data => {
   return axios.post(`${pollUrl}/create-post-pole`, data);
@@ -68,14 +67,6 @@ export const pollShareCount = poll_id => {
   return axios.get(`${pollShareUrl}/total-sahre/${poll_id}`);
 };
 
-/**
-http://upvoteapi.inawebtech.com/api/v1/pollLike/add-poll-like
-http://upvoteapi.inawebtech.com/api/v1/pollLike/remove-poll-like/{poll_id}
-http://upvoteapi.inawebtech.com/api/v1/pollLike/total-like/{Poll_id}
-http://upvoteapi.inawebtech.com/api/v1/pollLike/like-list/{Poll_ID}
-
- */
-
 // Like ----
 
 export const PollLike = data => {
@@ -84,18 +75,67 @@ export const PollLike = data => {
 
 // Remove Like
 
-export const RemovePollLike = (poll_id,data) => {
-  return axios.post(`${pollLikeUrl}/remove-poll-like/${poll_id}`,data);
-}
+export const RemovePollLike = (poll_id, data) => {
+  return axios.post(`${pollLikeUrl}/remove-poll-like/${poll_id}`, data);
+};
 
-// Total Like 
+// Total Like
 
-export const PollLikeCount = poll_id =>{
+export const PollLikeCount = poll_id => {
   return axios.get(`${pollLikeUrl}/total-like/${poll_id}`);
-}
+};
 
 // Like List
 
-export const PollLikelist =poll_id => {
+export const PollLikelist = poll_id => {
   return axios.get(`${pollLikeUrl}/like-list/${poll_id}`);
-}
+};
+
+/**
+ * Poll Comment Add
+ * @param data - { poll_user_id, comment_user_id, poll_id, poll_comment}
+ * @returns
+ */
+export const AddPollComment = data => {
+  return axios.post(`${pollCommentUrl}/add-poll-comment`, data);
+};
+
+/**
+ * Edit Poll Comment
+ * @param {* poll_cmnt_id Poll Comment id  }
+ * @param {*data {poll_user_id, comment_user_id, poll_id, poll_comment}}
+ * @returns
+ */
+export const EditPollComment = (poll_cmnt_id, data) => {
+  return axios.post(
+    `${pollCommentUrl}/edit-poll-comment/${poll_cmnt_id}`,
+    data,
+  );
+};
+
+/**
+ * Delete Poll Comment
+ * @param  poll_cmnt_id Poll Comment Id
+ * @returns
+ */
+export const DeletePollComment = poll_cmnt_id => {
+  return axios.post(`${pollCommentUrl}/delete-poll-comment/${poll_cmnt_id}`);
+};
+
+/**
+ * Total Poll Comment
+ * @param  poll_id Poll Id
+ * @returns
+ */
+export const CountPollComment = poll_id => {
+  return axios.get(`${pollCommentUrl}/total-comment/${poll_id}`);
+};
+
+/**
+ * Poll Comment List
+ * @param  poll_id Poll Id
+ * @returns
+ */
+export const PollCommentList = poll_id => {
+  return axios.get(`${pollCommentUrl}/comment-friends-list/${poll_id}`);
+};

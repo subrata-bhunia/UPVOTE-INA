@@ -38,11 +38,21 @@ import {
 } from '../api/questions';
 import ModelCmp from './ModelCmp';
 import moment from 'moment';
-import { PollLikeCount, pollShareCount } from '../api/poll';
+import {
+  BlockPoll,
+  CountPollComment,
+  DeletePoll,
+  PollLike,
+  PollLikeCount,
+  pollShare,
+  pollShareCount,
+  RemovePollLike,
+  ViewSinglePoll,
+} from '../api/poll';
 // poll
 export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
   var question = question;
-  console.log('question', question);
+  // console.log('question', question);
   let value = 0;
   const [show, setshow] = useState(false);
   const [viewResult, setViewResult] = useState(false);
@@ -51,10 +61,12 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
   const [totalComment_p, setTotalComment_p] = useState(0);
   const [totalShare_p, settotalShare_p] = useState(0);
   const [mypost, setmypost] = useState(false);
+  const [duration, setDuration] = useState(null);
+  const [pollDetails, setPollDetails] = useState(null);
   useEffect(() => {
-    // MagicCommentCount(optionsList?.id).then(res=>{
-    //     setTotalComment_q(res?.data?.data)
-    // })
+    CountPollComment(question?.id).then(res => {
+      setTotalComment_p(res?.data?.data);
+    });
     PollLikeCount(question?.id).then(res => {
       setTotalLike_p(res?.data?.data);
     });
@@ -62,9 +74,92 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
       settotalShare_p(res?.data?.data);
     });
   });
+  useEffect(() => {
+    if (myID === question?.user_id) {
+      setmypost(true);
+    }
+    ViewSinglePoll(question?.id)
+      .then(res => {
+        setDuration(res?.data?.data?.duration_id);
+        setPollDetails(res?.data?.data);
+      })
+      .catch(err => {
+        console.log(JSON.stringify(err));
+      });
+  }, [question]);
+  //Delete
+  const _DeletePoll = () => {
+    DeletePoll(question?.id)
+      .then(res => {
+        console.log(res.data?.msg);
+        onDelete();
+        setdel(true);
+      })
+      .catch(err => console.log(err));
+  };
+  // Like
+  const LikePressP = () => {
+    PollLike({
+      poll_user_id: question?.user_id,
+      like_user_id: myID,
+      poll_id: question?.id,
+    })
+      .then(res => {
+        console.log(res.data);
+        setTotalLike_p(totalLike_p + 1);
+      })
+      .catch(err => {
+        RemovePollLike(question?.id, {
+          like_user_id: myID,
+        })
+          .then(res => {
+            console.log(res.data?.msg);
+            setTotalLike_p(totalLike_p - 1);
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      });
+  };
+  // ------- SHARE ------- //
+  const SharePressP = () => {
+    pollShare({
+      poll_user_id: question?.user_id,
+      share_user_id: myID,
+      poll_id: question?.id,
+    })
+      .then(res => {
+        console.log(res.data?.msg);
+        settotalShare_p(totalShare_p + 1);
+      })
+      .catch(err => {
+        if (err) {
+          alert('You already share this.');
+        }
+      });
+  };
+  // Edit
+  const EditPress = () => {
+    navigation.navigate('PostAPollScreen', pollDetails);
+    setshow(false);
+  };
+  // ------ Block -------- //
+  const _BlockPoll = () => {
+    setreporticon(false);
+    BlockPoll(question?.id, {
+      U_ID: myID,
+    })
+      .then(res => {
+        console.log(res?.data);
+        onDelete();
+      })
+      .catch(err => {
+        console.log(JSON.stringify(err));
+      });
+  };
   return (
     <View style={{width: '100%', marginTop: wp(5)}}>
-      {reporticon === true ? <ModalCmp /> : null}
+      {reporticon === true ? <ModalCmp onPress={() => _BlockPoll()} /> : null}
       <View
         style={{
           flexDirection: 'row',
@@ -112,7 +207,7 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                 ))}
             </TouchableOpacity>
 
-            {show === true && viewResult === false ? (
+            {mypost ? (
               <>
                 <DropShadow
                   style={[
@@ -124,7 +219,10 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                       top: wp(1),
                     },
                   ]}>
-                  <View
+                  <TouchableOpacity
+                    onPress={() => {
+                      EditPress();
+                    }}
                     style={{
                       height: wp(10),
                       width: wp(10),
@@ -141,7 +239,7 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                         resizeMode: 'contain',
                       }}
                     />
-                  </View>
+                  </TouchableOpacity>
                 </DropShadow>
 
                 <DropShadow
@@ -154,7 +252,7 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                       top: wp(1),
                     },
                   ]}>
-                  <View
+                  <TouchableOpacity
                     style={{
                       height: wp(10),
                       width: wp(10),
@@ -162,6 +260,10 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                       backgroundColor: Colors.bg,
                       justifyContent: 'center',
                       alignItems: 'center',
+                    }}
+                    onPress={() => {
+                      _DeletePoll();
+                      setshow(!show);
                     }}>
                     <Image
                       source={Images.ic_deletepost}
@@ -171,7 +273,7 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                         resizeMode: 'contain',
                       }}
                     />
-                  </View>
+                  </TouchableOpacity>
                 </DropShadow>
               </>
             ) : (
@@ -386,7 +488,7 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                     alignItems: 'center',
                     justifyContent: 'space-around',
                   }}>
-                  <Text style={styles.value}>{`${value} votes`}</Text>
+                  <Text style={styles.value}>{value} Votes</Text>
                   <View
                     style={{
                       width: wp(1.5),
@@ -395,11 +497,9 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                       backgroundColor: Colors.bg1,
                     }}
                   />
-                  <Text
-                    style={[
-                      styles.value,
-                      {color: Colors.lightblack},
-                    ]}>{`1 week left`}</Text>
+                  <Text style={[styles.value, {color: Colors.lightblack}]}>
+                    {moment(duration?.day).fromNow()}
+                  </Text>
                   <View
                     style={{
                       width: wp(1.5),
@@ -428,7 +528,8 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}>
-                  <View
+                  <TouchableOpacity
+                    onPress={() => LikePressP()}
                     style={{
                       width: '20%',
                       flexDirection: 'row',
@@ -437,8 +538,9 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                     }}>
                     <AntDesign name="hearto" color={Colors.bg} size={wp(6)} />
                     <Text style={styles.text}>{totalLike_p}</Text>
-                  </View>
-                  <View
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    // onPress={}
                     style={{
                       width: '20%',
                       flexDirection: 'row',
@@ -451,8 +553,9 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                       size={wp(6)}
                     />
                     <Text>{totalComment_p}</Text>
-                  </View>
-                  <View
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => SharePressP()}
                     style={{
                       width: '20%',
                       flexDirection: 'row',
@@ -465,7 +568,7 @@ export const PostCmp = ({question = {}, setdel, onDelete, navigation}) => {
                       size={wp(8)}
                     />
                     <Text>{totalShare_p}</Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -530,7 +633,7 @@ export const PostAQuestionCmp = ({
         console.log(JSON.stringify(err));
       });
   }, [optionsList]);
-  // ------ LIKE -------- //
+  // ------ Block -------- //
   const _BlockQuestion = () => {
     setreporticon(false);
     BlockQuestion(optionsList?.id, {
@@ -544,6 +647,7 @@ export const PostAQuestionCmp = ({
         console.log(JSON.stringify(err));
       });
   };
+  // Like
   const LikePressQ = () => {
     QuestionLike({
       qus_user_id: optionsList?.user_id,
@@ -1373,7 +1477,6 @@ export const PostMagicQuestionCmp = ({question = {}, onDelete, navigation}) => {
                   </Text>
                 </View>
               </View>
-
               <View
                 style={{
                   height: hp(5),

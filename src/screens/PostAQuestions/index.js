@@ -191,7 +191,7 @@ const PostAQuestion = ({navigation}) => {
     op3link,
     op4link,
   ]);
-  console.log(category);
+  // console.log(category);
 
   useEffect(() => {
     ListCategory().then(res => {
@@ -272,7 +272,6 @@ const PostAQuestion = ({navigation}) => {
                     }}
                     style={{color: Colors.text6}}
                   />
-
                   <Text
                     style={{
                       width: '100%',
@@ -425,6 +424,7 @@ const PostAQuestion = ({navigation}) => {
               height: hp(37),
               justifyContent: 'center',
               alignItems: 'center',
+              marginBottom: hp(3),
             }}>
             <DropShadow style={ContainerStyles.shadow1}>
               <View

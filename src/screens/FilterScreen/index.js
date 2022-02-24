@@ -30,9 +30,7 @@ import {MyMagicQuestion} from '../../api/magic-questions';
 import {myID} from '../VerifyOTPNumberScreen';
 import {MyQuestions} from '../../api/questions';
 import {useIsFocused} from '@react-navigation/native';
-import { PollList } from '../../api/poll';
-var friendId = '61f26db96d124a0503f5c94e';
-// import { useFocusEffect } from '@react-navigation/native';
+import {PollList} from '../../api/poll';
 
 const FilterScreen = ({navigation}) => {
   const [refreshing, setRefreshing] = React.useState(false);
@@ -45,21 +43,23 @@ const FilterScreen = ({navigation}) => {
     setRefreshing(true);
     getMagicQuestionList();
     getMyQuestionList();
+    getPoll();
     wait(200).then(() => setRefreshing(false));
   }, []);
   const onDelete = React.useCallback(() => {
     getMagicQuestionList();
     getMyQuestionList();
+    getPoll();
   }, []);
   const list = ['Poll', 'Questions', 'Magic Question'];
   const [search, setSearch] = useState(false);
   const [magicQlist, setmagicQlist] = useState([]);
   const [questionList, setQlist] = useState([]);
-  const [pollList,setPollList] = useState([]);
+  const [pollList, setPollList] = useState([]);
   const [allQ, setAllQ] = useState([]);
   const [del, setdel] = useState(false);
   const isFocused = useIsFocused();
-  // -------------GET MAGIC----------------------- // 
+  // -------------GET MAGIC----------------------- //
   const getMagicQuestionList = () => {
     MyMagicQuestion(myID)
       .then(res => {
@@ -79,14 +79,16 @@ const FilterScreen = ({navigation}) => {
         console.log(err);
       });
   };
- // ----------------GET POLL-------------------- //
- const getPoll = () =>{
-     PollList(myID).then(res=>{
-         setPollList(res?.data?.data);
-     }).catch((err)=>{
-         console.log(JSON.stringify(err));
-     })
- }
+  // ----------------GET POLL-------------------- //
+  const getPoll = () => {
+    PollList(myID)
+      .then(res => {
+        setPollList(res?.data?.data);
+      })
+      .catch(err => {
+        console.log(JSON.stringify(err));
+      });
+  };
 
   // --------------------------------------------- //
   useEffect(() => {
@@ -94,10 +96,10 @@ const FilterScreen = ({navigation}) => {
     getMyQuestionList();
     getPoll();
   }, [del, isFocused]);
-  var all = magicQlist.concat(questionList,pollList);
+  var all = magicQlist.concat(questionList, pollList);
   useEffect(() => {
     setAllQ(all);
-  }, [magicQlist, questionList]);
+  }, [magicQlist, questionList, pollList]);
 
   allQ.sort(function (a, b) {
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -158,9 +160,15 @@ const FilterScreen = ({navigation}) => {
                     />
                   );
                 } else if (item.description !== undefined) {
-                    return (
-                        <PostCmp key={ind} question={item}/>
-                    )
+                  return (
+                    <PostCmp
+                      key={ind}
+                      question={item}
+                      navigation={navigation}
+                      setdel={setdel}
+                      onDelete={() => onDelete()}
+                    />
+                  );
                 }
               })
             : null}

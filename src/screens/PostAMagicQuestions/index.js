@@ -452,8 +452,10 @@ const PostAMagicQuestions = ({navigation, route}) => {
           title="Answer Duration"
           value={
             getDuration !== null
-              ? moment(getDuration?.day).fromNow('left') + ' left'
+              ? moment(getDuration?.day).fromNow()
               : Duration?.title
+              ? Duration?.title
+              : 'Select'
           }
           onPress={() => setdurationShow(!durationShow)}
         />
